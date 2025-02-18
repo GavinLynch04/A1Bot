@@ -23,8 +23,8 @@ class SARBaseAgent(AssistantAgent):
         from dotenv import load_dotenv
         load_dotenv()
         return [{
-            "model": "gpt-4",
-            "api_key": os.getenv("OPENAI_API_KEY"),
+            "model": "gemini-pro",
+            "api_key": os.getenv("GOOGLE_API_KEY"),
             "deployment_name": os.getenv("DEPLOYMENT_NAME")
         }]
 
