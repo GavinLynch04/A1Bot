@@ -1,16 +1,8 @@
-# Search and Rescue (SAR) Agent Framework - CSC 581
+# First Aid Specialist Agent - CSC 581
 
 ## Introduction
 
-This framework is for CSC 581 students to develop intelligent agents supporting the AI4S&R project. Students can create specialized agents for various SAR roles such as those listed in this spreadsheet:
-
-https://docs.google.com/spreadsheets/d/1QZK5HAdDC-_XNui6S0JZTbJH5_PbYJTp8_gyhXmz8Ek/edit?usp=sharing
-https://docs.google.com/spreadsheets/d/11rBV9CbKNeQbWbaks8TF6GO7WcSUDS_-hAoH75UEkgQ/edit?usp=sharing
-
-Each student or team will choose a specific role within the SAR ecosystem and implement an agent that provides decision support and automation for that role.
-
-## How to Submit
-Please submit a link to your clone of the repository to Canvas. 
+This agent is built to assist search and rescue personnel in a rescue or first aid situation. It contains a RAG database with expert first aid documents that it will pull from to generate recommendations. It also has the ability to locate the current weather and the nearest hospital to SAR personnel. It can be used to inform decisions in the field on what first aid best practices are.
 
 ## Prerequisites
 
@@ -47,13 +39,6 @@ pip install -e .
 
 4. Configure environment variables:
 
-#### OpenAI:
-- Obtain required API keys:
-  1. OpenAI API key: Sign up at https://platform.openai.com/signup
-- Update your `.env` file with the following:
-    ```
-    OPENAI_API_KEY=your_openai_api_key_here
-    ```
 #### Google Gemini:
 - Obtain required API keys:
   1. ``` pip install google-generativeai ```
@@ -64,7 +49,9 @@ pip install -e .
   genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
   ```
 
-Make sure to keep your `.env` file private and never commit it to version control.
+5. Run the agent
+
+The first aid agent file in the agent's folder needs to be run in order to converse with the chatbot. From there it will remember chat history and give recommendations.
 
 ## Project Structure
 
@@ -89,36 +76,3 @@ This project follows modern Python development practices:
 2. Use `pip install -e .` for development installation
 3. Run tests with `pytest tests/`
 4. Follow the existing code style and structure
-5. Make sure to update requirements.txt when adding dependencies
-
-
-## FAQ
-
-### Assignment Questions
-
-**Q: How do I choose a role for my agent?**
-
-**A:** Review the list of SAR roles above and consider which aspects interest you most. Your agent should provide clear value to SAR operations through automation, decision support, or information processing.
-
-**Q: What capabilities should my agent have?**
-
-**A:** Your agent should handle tasks relevant to its role such as: data processing, decision making, communication with other agents, and providing actionable information to human operators.
-
-**Q: Can I add new dependencies?**
-
-**A:** Yes, you can add new Python packages to requirements.txt as needed for your implementation.
-
-
-### Technical Questions
-
-**Q: Why am I getting API key errors?**
-
-**A:** Ensure you've properly set up your .env file and obtained valid API keys from the services listed above.
-
-**Q: How do I test my agent?**
-
-**A:** Use the provided test framework in the tests/ directory. Write tests that verify your agent's core functionality.
-
-**Q: Can I use external libraries for my agent?**
-
-**A:** Yes, you can use external libraries as long as they are compatible.
