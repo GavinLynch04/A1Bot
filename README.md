@@ -74,5 +74,4 @@ This project follows modern Python development practices:
 
 1. Source code is organized in the `src/sar_project` layout
 2. Use `pip install -e .` for development installation
-3. Run tests with `pytest tests/`
-4. Follow the existing code style and structure
+3. Run tests with `pytest`
