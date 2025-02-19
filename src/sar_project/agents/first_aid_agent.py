@@ -12,6 +12,7 @@ from math import radians, cos, sin, sqrt, atan2
 from dotenv import load_dotenv
 load_dotenv()
 
+base = KnowledgeBase()
 genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
 class FirstAidAgent(SARBaseAgent):
@@ -112,7 +113,7 @@ class FirstAidAgent(SARBaseAgent):
         """Find the nearest hospital using OpenStreetMap's Overpass API"""
         query = f"""
             [out:json][timeout:25];
-            nwr(around:10000,{base.lat},{base.lon})["amenity"="hospital"];
+            nwr(around:100000,{base.lat},{base.lon})["amenity"="hospital"];
             out center;
             """
 
@@ -219,19 +220,30 @@ class FirstAidAgent(SARBaseAgent):
 
 if __name__ == "__main__":
     agent = FirstAidAgent()
-    base = KnowledgeBase()
     print("Enter lat and lon coordinates below for weather conditions and other features.")
     lat = input("Enter latitude (or leave blank): ")
     lon = input("Enter longitude (or leave blank): ")
     i=0
     while True:
-        userInput = input("Enter a first-aid-related request: ")
-        agent.update_user_data(userInput, lat, lon)
-        if lat and lon and i==0:
-            base.weather = agent.get_weather_conditions()
-            base.nearest_hospital = agent.get_nearest_hospital()
-            i+=1
+        userInput = input("Enter a first-aid-related request (type help for more information): ")
+        if userInput.lower() == "help":
+            print("Available requests:")
+            print("Type 'Make a map' to generate a map with your location and the nearest hospital.")
+            print("The bot can answer questions related to first aid and search and rescue.")
+            print("The bot also has access to your weather conditions and will take them into account.")
+        elif userInput.lower() == "make a map":
+            agent.update_user_data(userInput, lat, lon)
+            if lat and lon and i == 0:
+                base.weather = agent.get_weather_conditions()
+                base.nearest_hospital = agent.get_nearest_hospital()
+                i += 1
+            agent.generate_map()
+        else:
+            agent.update_user_data(userInput, lat, lon)
+            if lat and lon and i==0:
+                base.weather = agent.get_weather_conditions()
+                base.nearest_hospital = agent.get_nearest_hospital()
+                i+=1
 
-        agent.summarize_chat_history()
-        print(agent.process_request(userInput))
-        agent.generate_map()
+            agent.summarize_chat_history()
+            print(agent.process_request(userInput))
