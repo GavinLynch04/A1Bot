@@ -5,6 +5,7 @@ import google.generativeai as genai
 from sar_project.knowledge.knowledge_base_firstaid import KnowledgeBase
 import json
 import re
+import webbrowser
 import folium
 from folium.plugins import AntPath
 from math import radians, cos, sin, sqrt, atan2
@@ -37,6 +38,7 @@ class FirstAidAgent(SARBaseAgent):
 
     def summarize_chat_history(self):
         """Summarize chat history to keep context without excessive length."""
+        #Prompt Gemini to shorten the chat history to reduce prompt lengths
         if len(base.chat_history) > 6:
             summary_prompt = (
                 "Summarize the following chat history while keeping all relevant first-aid and rescue details:\n\n"
@@ -81,6 +83,7 @@ class FirstAidAgent(SARBaseAgent):
             return f"Error: {e}"
 
     def update_user_data(self, message, lat, lon):
+        # Prompt gemini to update the user data based on user message
         prompt = (
         "Update the following JSON data based on the user message. If there is no new relevant data, leave JSON as is. Never delete data, only add on."
         "Return only valid JSON without any extra text.\n\n"
@@ -104,7 +107,6 @@ class FirstAidAgent(SARBaseAgent):
         except Exception as e:
             return f"Error: {e}"
 
-    import requests
 
     def get_nearest_hospital(self):
         """Find the nearest hospital using OpenStreetMap's Overpass API"""
@@ -125,18 +127,19 @@ class FirstAidAgent(SARBaseAgent):
         if "elements" not in data or not data["elements"]:
             return "No hospital found nearby."
 
-        # Function to calculate haversine distance
+        # Function to calculate distance
         def haversine(lat1, lon1, lat2, lon2):
             R = 6371
             dlat = radians(lat2 - lat1)
             dlon = radians(lon2 - lon1)
             a = sin(dlat / 2) ** 2 + cos(radians(lat1)) * cos(radians(lat2)) * sin(dlon / 2) ** 2
             c = 2 * atan2(sqrt(a), sqrt(1 - a))
-            return R * c  # Distance in km
+            return R * c
 
         # List to store hospitals with distances
         hospitals = []
 
+        #Logic for sorting hospitals by distance
         for hospital in data["elements"]:
             if hospital["type"] == "node":
                 h_lat = hospital.get("lat")
@@ -163,6 +166,7 @@ class FirstAidAgent(SARBaseAgent):
 
     def extract_lat_lon(self):
         """Extract latitude and longitude from the hospital data string."""
+        # Kind of ridiculous regex but it works
         match = re.search(r"Location:\s*(-?\d+\.\d+),\s*(-?\d+\.\d+)", base.nearest_hospital)
         if match:
             lat, lon = map(float, match.groups())
@@ -198,18 +202,19 @@ class FirstAidAgent(SARBaseAgent):
             icon=folium.Icon(color="red", icon="plus-sign")
         ).add_to(hospital_map)
 
-        # Add a path (polyline) between the two points
+        # Add a path between the two points
         AntPath(
             locations=[[base.lat, base.lon], [hospital_lat, hospital_lon]],
             delay=1000, color="green", weight=4
         ).add_to(hospital_map)
 
-        # Save the map to an HTML file and return it
+        # Save the map to an HTML file and open it
         map_filename = "hospital_map.html"
         hospital_map.save(map_filename)
         print(f"Map generated: {map_filename}")
+        webbrowser.open(map_filename)
 
-        return map_filename  # Return the filename to be used in the app
+        return map_filename
 
 
 if __name__ == "__main__":
