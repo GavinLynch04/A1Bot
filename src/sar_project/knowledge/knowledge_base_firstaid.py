@@ -26,6 +26,10 @@ class KnowledgeBase:
             "rescuee_condition": "Rescuee Condition: ",
             "other_data": "Other Relevant Data: ",
         }
+        self.lat = None
+        self.lon = None
+        self.nearest_hospital = None
+        self.weather = ''
         self.chat_history = []
 
     def retrieve_relevant_text(self, input, top_k=1):
