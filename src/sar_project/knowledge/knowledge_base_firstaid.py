@@ -1,10 +1,7 @@
-import chromadb
-from llama_cpp import Llama
 import json
 import os
 import pdfplumber
 import chromadb
-import torch
 from sentence_transformers import SentenceTransformer
 
 METADATA_FILE = "./Documents/processed_pdfs.json"
@@ -32,6 +29,7 @@ class KnowledgeBase:
         self.weather = ''
         self.chat_history = []
 
+    # Searches through chromaDB for relevant information
     def retrieve_relevant_text(self, input, top_k=1):
         query_embedding = embedder.encode([input]).tolist()[0]
         results = collection.query(query_embeddings=[query_embedding], n_results=top_k)
@@ -54,7 +52,7 @@ def save_processed_pdfs(processed_pdfs):
     with open(METADATA_FILE, "w") as f:
         json.dump(processed_pdfs, f, indent=4)
 
-def process_text(text, source_name):  # ADD OVERLAP TO CHUNKS if needed
+def process_text(text, source_name):
     """Splits text into chunks, embeds them, and stores them in ChromaDB with overlap."""
     chunks = [text[i:i + 500] for i in range(0, len(text), 100)]
     embeddings = embedder.encode(chunks).tolist()

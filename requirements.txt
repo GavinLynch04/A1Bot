@@ -5,3 +5,7 @@ autogen
 requests
 google-generativeai
 folium
+protobuf
+pdfplumber
+chromadb
+sentence-transformers
