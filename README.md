@@ -6,7 +6,7 @@ This agent is built to assist search and rescue personnel in a rescue or first a
 
 ## Prerequisites
 
-- Python 3.8 or higher
+- Python 3.10 or higher
 - pyenv (recommended for Python version management)
 - pip (for dependency management)
 
@@ -21,8 +21,8 @@ cd sar-project
 2. Set up Python environment:
 ```bash
 # Using pyenv (recommended)
-pyenv install 3.9.6  # or your preferred version
-pyenv local 3.9.6
+pyenv install 3.10.0  # or your preferred version
+pyenv local 3.10.0
 
 # Create and activate virtual environment
 python -m venv .venv
