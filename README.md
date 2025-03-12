@@ -1,5 +1,13 @@
 # First Aid Specialist Agent - CSC 581
 
+## Insights
+
+Beck's recommendations proved to be very helpful, and made me wonder how I did not think of them previously. He suggested changing my location identification approach from coordinates to a city lookup, which I agreed is much more user-friendly. Making users find their current coordinates, especially in a SAR scenario, could be frustrating. To solve this, I added parsing to take in either a city name or coordinates (for more accurate maps and weather). Another great idea that Beck had was to include future weather, allowing the search and rescue personnel and the bot to take changes in weather into account when giving advice. 
+
+## Modifications
+As I stated above, the two big changes that I made to the bot were to improve the location entering experience, and also improve weather lookup to include future patterns. To implement the first change, I started by finding resources that could translate from city to location (lat and lon). I came accross geopy, which worked perfectly for my situation. It allows the look up of any city, and will quickly give coordinates to go with it. From there it was a matter of dealing with the parsing of user input, which took a bit of time to get right. 
+For weather, the change was fairly simple. All I needed to do was change my api call to include future weather reports as well, and this allowed me to add this to the model. I did have to change the knowledge base slightly as to help the model store and access the new information, but other than that it was an easy change.
+
 ## Introduction
 
 This agent is built to assist search and rescue personnel in a rescue or first aid situation. It contains a RAG database with expert first aid documents that it will pull from to generate recommendations. It also has the ability to locate the current weather and the nearest hospital to SAR personnel. It can be used to inform decisions in the field on what first aid best practices are.
