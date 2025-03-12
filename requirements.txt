@@ -6,6 +6,7 @@ requests
 google-generativeai
 folium
 protobuf
+geopy
 pdfplumber
 chromadb
 sentence-transformers

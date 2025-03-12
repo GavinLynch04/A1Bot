@@ -7,6 +7,7 @@ import json
 import re
 import webbrowser
 import folium
+from geopy.geocoders import Nominatim
 from folium.plugins import AntPath
 from math import radians, cos, sin, sqrt, atan2
 from dotenv import load_dotenv
@@ -51,13 +52,19 @@ class FirstAidAgent(SARBaseAgent):
 
     def get_weather_conditions(self):
         """Fetch current weather from Open-Meteo API"""
-        url = f"https://api.open-meteo.com/v1/forecast?latitude={base.lat}&longitude={base.lon}&current_weather=true"
+        url = f"https://api.open-meteo.com/v1/forecast?latitude={base.lat}&longitude={base.lon}&current_weather=true&hourly=temperature_2m,windspeed_10m,weathercode"
         response = requests.get(url)
         data = response.json()
 
-        if "current_weather" in data:
+        if "current_weather" in data and data["hourly"]:
             weather = data["current_weather"]
-            return f"Temperature: {weather['temperature']}°C, Wind Speed: {weather['windspeed']} km/h, Condition: {weather['weathercode']}"
+            future_index = 4  # 4th index corresponds to 4 hours ahead
+            future_weather = f"""future temperature: {data["hourly"]["temperature_2m"][future_index]}\n
+                windspeed: {data["hourly"]["windspeed_10m"][future_index]}\n
+                weathercode: {data["hourly"]["weathercode"][future_index]}\n
+                Weather data is for {future_index} hours from now
+            """
+            return f"Temperature: {weather['temperature']}°C, Wind Speed: {weather['windspeed']} km/h, Condition: {weather['weathercode']}", future_weather
 
         return "Weather data not available."
 
@@ -69,13 +76,15 @@ class FirstAidAgent(SARBaseAgent):
                 base.retrieve_relevant_text(message) +
                 "\n Below is current weather conditions: \n" +
                 base.weather +
+                "\n Below is future weather conditions: \n" +
+                base.future_weather +
                 "\n Below is the closest hospital: \n" +
                 base.nearest_hospital +
                 "\n Take into account the rescuee and rescuer data (if any), as well as previous chat history (if any) below to maintain consistency." +
                 str(base.data) +
                 "Chat History: " + str(base.chat_history))
 
-    def query_gemini(self, prompt, model="gemini-pro", max_tokens=None):
+    def query_gemini(self, prompt, model="gemini-2.0-flash", max_tokens=None):
         """Query Google Gemini API and return response."""
         try:
             response = genai.GenerativeModel(model).generate_content(prompt)
@@ -220,9 +229,18 @@ class FirstAidAgent(SARBaseAgent):
 
 if __name__ == "__main__":
     agent = FirstAidAgent()
-    print("Enter lat and lon coordinates below for weather conditions and other features.")
-    lat = input("Enter latitude (or leave blank): ")
-    lon = input("Enter longitude (or leave blank): ")
+    print("Enter your city, or latitude and longitude (lat, lon format) coordinates below for weather conditions and other features (or leave blank for default).")
+    cityOrLocation = input("Enter city, latitude, longitude, or leave blank for default: ")
+    if re.search(r'[0-9]', cityOrLocation):
+        loc = cityOrLocation.strip().split(sep=',')
+        lat = loc[0]
+        lon = loc[1]
+    else:
+        city = cityOrLocation.lower()
+        geolocator = Nominatim(user_agent="geo_lookup")
+        location = geolocator.geocode(city)
+        lat = location.latitude
+        lon = location.longitude
     i=0
     while True:
         userInput = input("Enter a first-aid-related request (type help for more information): ")
@@ -234,14 +252,14 @@ if __name__ == "__main__":
         elif userInput.lower() == "make a map":
             agent.update_user_data(userInput, lat, lon)
             if lat and lon and i == 0:
-                base.weather = agent.get_weather_conditions()
+                base.weather, base.future_weather = agent.get_weather_conditions()
                 base.nearest_hospital = agent.get_nearest_hospital()
                 i += 1
             agent.generate_map()
         else:
             agent.update_user_data(userInput, lat, lon)
             if lat and lon and i==0:
-                base.weather = agent.get_weather_conditions()
+                base.weather, base.future_weather = agent.get_weather_conditions()
                 base.nearest_hospital = agent.get_nearest_hospital()
                 i+=1
 

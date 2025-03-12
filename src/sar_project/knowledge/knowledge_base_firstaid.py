@@ -27,6 +27,7 @@ class KnowledgeBase:
         self.lon = None
         self.nearest_hospital = None
         self.weather = ''
+        self.future_weather = ''
         self.chat_history = []
 
     # Searches through chromaDB for relevant information
